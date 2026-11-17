@@ -58,11 +58,12 @@ void writeOffset(void* object, std::size_t offset, const T& value)
     );
 }
 
-typedef uint64_t(__cdecl _origFunc)(void* arg1,
+typedef uint64_t(__cdecl _origFunc)(
+    void* arg1,
     void* arg2,
     void* arg3,
     void* arg4,
-    float arg5);
+    void* arg5);
 _origFunc* originalFunction;
 
 
@@ -71,7 +72,7 @@ uint64_t __cdecl updateObjects(
     void* arg2,
     void* arg3,
     void* arg4,
-    float arg5)
+    void* arg5)
 {
     if (arg4)
     {
@@ -167,7 +168,7 @@ uint64_t callHook(DWORD hookOffset, uint64_t newFunction)
     memcpy(&trampoline[2], &newFunction, 8);
 
     // Write the trampoline in an empty space of memory
-    auto oldTrampolineProtection = protectMemory<DWORD[3]>((memBase + 0x00013FAA), PAGE_EXECUTE_READWRITE);
+    auto oldTrampolineProtection = protectMemory<DWORD>((memBase + 0x00013FAA), PAGE_EXECUTE_READWRITE);
     memcpy((LPVOID)(memBase + 0x00013FAA), trampoline, sizeof(trampoline));
     protectMemory<DWORD>((memBase + 0x00013FAA), oldTrampolineProtection);
 
